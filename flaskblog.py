@@ -6,6 +6,10 @@ from flask import Flask, render_template, url_for
 
 app = Flask(__name__)
 
+# secret key protects against modifying cookies,
+# crossite requests and forgery attacks.
+app.config['secret_key'] = "rohit97"
+
 posts = [
     {
         'title':'One Piece',
