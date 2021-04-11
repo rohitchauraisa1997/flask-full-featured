@@ -1,0 +1,13 @@
+{
+    "python.pythonPath": "C:\\Python\\3.9\\python.exe",
+    "jupyter.jupyterServerType": "local",
+    "python.autoComplete.extraPaths": [
+        "C:\\Users\\rohit\\Desktop\\Python-Concepts\\learning_imports"
+    ],
+    "python.analysis.extraPaths": [
+        "C:\\Users\\rohit\\Desktop\\Python-Concepts\\learning_imports",
+        "C:\\Users\\rohit\\Desktop\\",
+        "C:\\Users\\rohit\\Desktop\\Projects\\Stock-Analyser-App\\website\\stock_update",
+        // "C:\\Users\\rohit\\Desktop\\flask-full-featured"
+    ],
+}
