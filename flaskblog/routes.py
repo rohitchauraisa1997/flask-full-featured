@@ -55,6 +55,14 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
+            # helps redirecting us to correct route
+            # Exmaple:- in case we directly went for route...
+            # http://127.0.0.1:5000/account
+            # it will take us to login page first and then when we 
+            # login correctly it takes us to account.
+            # print("&"*100)
+            # print(request.args)
+            # print("&"*100)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
