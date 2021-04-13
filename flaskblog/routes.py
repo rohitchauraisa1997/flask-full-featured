@@ -1,9 +1,9 @@
-from flask import  render_template, url_for, flash, redirect
+from flask import  render_template, url_for, flash, redirect, request
 from flaskblog import app
 from flaskblog.models import User, Post
 from flaskblog.forms import RegistrationForm, LoginForm
 from flaskblog import db, bcrypt
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 
 posts = [
     {
@@ -46,22 +46,33 @@ def register():
     
     return render_template('register.html',title='Register', form=form)
 
-@app.route("/login",methods=["GET","POST"])
+@app.route("/login", methods=['GET', 'POST'])
 def login():
-    # if user is already logged in redirect to home.
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user,remember=form.remember.data)
-            return redirect(url_for('home'))
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
-            flash('Login Unsuccessful, Please check email and password','danger')
-    return render_template('login.html',title='Login', form=form)
+            flash('Login Unsuccessful. Please check email and password', 'danger')
+    return render_template('login.html', title='Login', form=form)
 
-@app.route("/logout",methods=["GET","POST"])
+@app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+@app.route("/account")
+@login_required
+def account():
+    print("*"*100)
+    print(current_user.username)
+    print(current_user.image_file)
+    print(current_user.email)
+    print("*"*100)
+    return render_template('account.html',title='Account') 
