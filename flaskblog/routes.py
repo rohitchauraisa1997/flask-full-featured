@@ -1,3 +1,5 @@
+import secrets
+import os
 from flask import  render_template, url_for, flash, redirect, request
 from flaskblog import app
 from flaskblog.models import User, Post
@@ -74,6 +76,16 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+def save_picture(form_picture):
+    # saves the image to our filesystem
+    # randomising the name of image with random hex.
+    random_hex = secrets.token_hex(8)
+    file_name, file_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + file_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+    # saves image to filesystem
+    form_picture.save(picture_path)
+    return picture_fn
 
 @app.route("/account",methods=['GET', 'POST'])
 @login_required
@@ -85,7 +97,11 @@ def account():
     print("*"*100)
     form = UpdateAccountForm()
     if form.validate_on_submit():
-        # updating user's username and email.
+        # updating user's username, picture and email.
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+        
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
