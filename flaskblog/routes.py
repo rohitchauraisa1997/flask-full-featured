@@ -1,7 +1,8 @@
+from operator import pos
 import secrets
 import os
 from PIL import Image
-from flask import  render_template, url_for, flash, redirect, request
+from flask import  render_template, url_for, flash, redirect, request, abort
 from flaskblog import app
 from flaskblog.models import User, Post
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
@@ -134,5 +135,36 @@ def new_post():
         db.session.commit()
         flash("Your Post has been created.")
         return redirect(url_for('home'))
-    return render_template('create_post.html', title='New Post', form=form)
+    return render_template('create_post.html', title='New Post', form=form, legend="Add Post")
 
+@app.route("/post/<int:post_id>")
+def post(post_id):
+    # give post with this id else return get_or_404
+    # that is post doesnt exist.
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=post.title, post=post)
+
+@app.route("/post/<int:post_id>/update",methods=['GET', 'POST'])
+@login_required
+def update_post(post_id):
+    # give post with this id else return get_or_404
+    # that is post doesnt exist.
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        # forbidden route 403
+        abort(403)
+    form = PostForm()
+    if form.validate_on_submit():
+        print("="*30)
+        print(form.title.data)
+        print(form.content.data)
+        print("="*30)
+        post.title = form.title.data
+        post.content = form.content.data
+        db.session.commit()
+        flash("Your Post has been updated", category='success')
+        return redirect(url_for('post',post_id=post.id))
+    elif request.method == 'GET':
+        form.title.data = post.title
+        form.content.data = post.content
+    return render_template('create_post.html', title="Update Post", form=form, legend="Update Post")
