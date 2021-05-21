@@ -1,0 +1,11 @@
+requests
+flask
+flask_sqlalchemy
+pytz
+bs4
+flask_login
+pillow
+flask_bcrypt
+flask_wtf
+email_validator
+flask-mail
